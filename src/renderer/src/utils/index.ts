@@ -1,1 +1,1 @@
-export const fetchFiles = async (name?: string) => await window.context.fetchTemplateNames(name)
+export const fetchFiles = async () => await window.context.fetchTemplateNames()

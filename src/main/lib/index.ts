@@ -1,14 +1,15 @@
-import { fileEncoding, templateDir } from '@shared/constants'
+import { PATH, fileEncoding, templateDir } from '@shared/constants'
 import { DeleteTemplate, FetchTemplate, FetchTemplateNames, TableSchema } from '@shared/types'
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
 
-export const getDir = (dir: string) => `${__dirname}\\${dir}`
+export const getDir = (dir: string) => `${PATH}\\${dir}`
 
 export const saveTemplate = async (data: TableSchema[], name: string) => {
   try {
     const dir = getDir(templateDir)
     await ensureDir(dir)
+    console.log('dir ', dir)
 
     console.log('name ', name)
 
