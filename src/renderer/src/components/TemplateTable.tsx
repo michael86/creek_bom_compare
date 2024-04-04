@@ -4,11 +4,12 @@ type Props = {
   onClick: React.MouseEventHandler<HTMLButtonElement>
   tableNames: TableSchema[]
   edit?: boolean
+  innerRef?: React.RefObject<HTMLTableElement>
 }
-const TemplateTable: React.FC<Props> = ({ onClick, tableNames, edit = false }) => {
+const TemplateTable: React.FC<Props> = ({ onClick, tableNames, edit = false, innerRef }) => {
   return (
     <>
-      <table className="add-template table">
+      <table className="add-template table" ref={innerRef}>
         <thead>
           <tr>
             <th>Name</th>
