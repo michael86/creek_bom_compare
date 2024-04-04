@@ -1,5 +1,5 @@
 import { fileEncoding, templateDir } from '@shared/constants'
-import { DeleteTemplate, FetchTemplate, TableSchema } from '@shared/types'
+import { DeleteTemplate, FetchTemplate, FetchTemplateNames, TableSchema } from '@shared/types'
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
 
@@ -34,10 +34,9 @@ export const saveTemplate = async (data: TableSchema[], name: string) => {
   }
 }
 
-export const fetchTemplateNames: FetchTemplate = async (name) => {
+export const fetchTemplateNames: FetchTemplateNames = async () => {
   try {
-    const target = name ? path.join(templateDir, `${name}.json`) : templateDir
-    const dir = getDir(target)
+    const dir = getDir(templateDir)
     await ensureDir(dir) //incase it doesn't exists
     const files = await fs.readdir(dir)
     return files.map((file) => file.replace('.json', ''))
@@ -65,5 +64,17 @@ export const deleteTemplate: DeleteTemplate = async (name) => {
   } catch (error) {
     console.error(error)
     return false
+  }
+}
+
+export const fetchTemplate: FetchTemplate = async (name) => {
+  try {
+    const target = path.join(templateDir, `${name}.json`)
+    const dir = getDir(target)
+    const data = await fs.readFile(dir, fileEncoding)
+    return JSON.parse(data)
+  } catch (error) {
+    console.error(error)
+    return
   }
 }

@@ -1,4 +1,10 @@
-import { DeleteTemplate, FetchTemplateNames, GetDir, SaveTemplate } from '@shared/types'
+import {
+  DeleteTemplate,
+  FetchTemplate,
+  FetchTemplateNames,
+  GetDir,
+  SaveTemplate
+} from '@shared/types'
 
 declare global {
   interface Window {
@@ -9,6 +15,7 @@ declare global {
       saveTemplate: SaveTemplate
       fetchTemplateNames: FetchTemplateNames
       deleteTemplate: DeleteTemplate
+      fetchTemplate: FetchTemplate
     }
   }
 }

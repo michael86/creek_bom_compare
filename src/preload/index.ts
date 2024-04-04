@@ -12,7 +12,8 @@ try {
     saveTemplate: (data: TableSchema[], name: string) =>
       ipcRenderer.invoke('saveTemplate', data, name),
     fetchTemplateNames: (name?: string) => ipcRenderer.invoke('fetchTemplateNames', name),
-    deleteTemplate: (name) => ipcRenderer.invoke('deleteTemplate', name)
+    deleteTemplate: (name) => ipcRenderer.invoke('deleteTemplate', name),
+    fetchTemplate: (name) => ipcRenderer.invoke('fetchTemplate', name)
   })
 } catch (error) {
   console.error(error)
