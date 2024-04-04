@@ -42,6 +42,7 @@ const AddTemplate: React.FC = () => {
       return
     }
     toast.success('Saved template')
+    setTableNames([])
   }
 
   return (
@@ -60,27 +61,31 @@ const AddTemplate: React.FC = () => {
           Add New Header
         </button>
       </form>
-      <table className="add-template table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Column</th>
-            <th>Row</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableNames.map((header, index) => (
-            <tr key={index}>
-              <td>{header.name}</td>
-              <td>{header.col}</td>
-              <td>{header.row}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <button className="add-template save" onClick={onClick}>
-        Save Template
-      </button>
+      {tableNames.length > 0 && (
+        <>
+          <table className="add-template table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Column</th>
+                <th>Row</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableNames.map((header, index) => (
+                <tr key={index}>
+                  <td>{header.name}</td>
+                  <td>{header.col}</td>
+                  <td>{header.row}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button className="add-template save" onClick={onClick}>
+            Save Template
+          </button>
+        </>
+      )}
     </>
   )
 }
