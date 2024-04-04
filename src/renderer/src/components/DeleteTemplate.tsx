@@ -1,15 +1,22 @@
+import { fetchFiles } from '@renderer/utils'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
+import SelectTemplate from './SelectTemplate'
 
 const DeleteTemplate = () => {
   const [files, setFiles] = useState<string[] | null>(null)
   const select = useRef<HTMLSelectElement | null>(null)
+
   useEffect(() => {
-    const fetchTemplates = async () => setFiles(await window.context.fetchTemplate())
-    fetchTemplates()
-  }, [])
+    ;(async () => {
+      const files = await fetchFiles()
+      setFiles(files)
+    })()
+  }, [fetchFiles])
 
   const onClick = async () => {
+    console.log('select.current', select.current)
+    console.log('files', files)
     if (!select.current || !files) return
 
     const target = select.current.value
@@ -28,16 +35,14 @@ const DeleteTemplate = () => {
       <h2>Delete Template</h2>
       {files && (
         <>
-          <select name="templates" id="templates" ref={select}>
-            {files.map((file) => {
-              return (
-                <option value={file} key={file}>
-                  {file}
-                </option>
-              )
-            })}
-          </select>
-          <button onClick={onClick}>Delete Template</button>
+          {files.length > 0 ? (
+            <>
+              <SelectTemplate innerRef={select} files={files} />
+              <button onClick={onClick}>Delete Template</button>
+            </>
+          ) : (
+            <p>No Templates</p>
+          )}
         </>
       )}
     </>

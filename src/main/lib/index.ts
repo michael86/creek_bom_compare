@@ -34,7 +34,7 @@ export const saveTemplate = async (data: TableSchema[], name: string) => {
   }
 }
 
-export const fetchTemplate: FetchTemplate = async (name) => {
+export const fetchTemplateNames: FetchTemplate = async (name) => {
   try {
     const target = name ? path.join(templateDir, `${name}.json`) : templateDir
     const dir = getDir(target)
@@ -51,6 +51,7 @@ export const deleteTemplate: DeleteTemplate = async (name) => {
   try {
     const target = path.join(templateDir, `${name}.json`)
     const file = getDir(target)
+
     fs.remove(file)
       .then(() => {
         console.log('deleted file ', name)

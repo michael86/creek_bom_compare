@@ -1,4 +1,4 @@
-import { deleteTemplate, fetchTemplate, getDir, saveTemplate } from '@/lib'
+import { deleteTemplate, fetchTemplateNames, getDir, saveTemplate } from '@/lib'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { TableSchema } from '@shared/types'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
@@ -57,7 +57,7 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.handle('getDir', (_, dir: string) => getDir(dir))
   ipcMain.handle('saveTemplate', (_, data: TableSchema[], name: string) => saveTemplate(data, name))
-  ipcMain.handle('fetchTemplate', (_, name?) => fetchTemplate(name))
+  ipcMain.handle('fetchTemplateNames', (_, name?) => fetchTemplateNames(name))
   ipcMain.handle('deleteTemplate', (_, name) => deleteTemplate(name))
 
   createWindow()

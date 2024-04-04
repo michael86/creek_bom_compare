@@ -11,7 +11,7 @@ try {
     getDir: (dir: string) => ipcRenderer.invoke('getDir', dir),
     saveTemplate: (data: TableSchema[], name: string) =>
       ipcRenderer.invoke('saveTemplate', data, name),
-    fetchTemplate: (name?: string) => ipcRenderer.invoke('fetchTemplate', name),
+    fetchTemplateNames: (name?: string) => ipcRenderer.invoke('fetchTemplateNames', name),
     deleteTemplate: (name) => ipcRenderer.invoke('deleteTemplate', name)
   })
 } catch (error) {
