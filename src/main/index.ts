@@ -1,5 +1,6 @@
-import { getDir } from '@/lib'
+import { getDir, saveTemplate } from '@/lib'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { TableSchema } from '@shared/types'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
@@ -55,6 +56,7 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.handle('getDir', (_, dir: string) => getDir(dir))
+  ipcMain.handle('saveTemplate', (_, data: TableSchema[], name: string) => saveTemplate(data, name))
 
   createWindow()
 

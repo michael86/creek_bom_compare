@@ -1,4 +1,4 @@
-import { GetDir } from '@shared/types'
+import { GetDir, SaveTemplate } from '@shared/types'
 
 declare global {
   interface Window {
@@ -6,6 +6,7 @@ declare global {
     context: {
       locale: string
       getDir: GetDir
+      saveTemplate: SaveTemplate
     }
   }
 }

@@ -1,0 +1,48 @@
+nav ul {
+  --nav-height: 30px;
+  height: var(--nav-height);
+  background-color: rgb(43, 42, 42);
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  text-align: center;
+}
+
+nav ul li {
+  position: relative;
+  width: 149px;
+  padding: 0 1rem;
+}
+
+nav ul ul li:hover {
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+}
+
+.nav-child {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: var(--nav-height);
+  left: 0;
+}
+
+.nav-child.show {
+  width: 100%;
+
+  padding: 0;
+  margin: 0;
+  height: fit-content;
+  opacity: 1;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.nav-child li {
+  width: 100%;
+}

@@ -1,0 +1,48 @@
+.add-template-header {
+  text-align: center;
+  margin: 2rem 0 1rem 0;
+}
+
+.add-template.container {
+  text-align: center;
+  width: 50%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-template.name {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: auto;
+  margin-bottom: 1rem;
+}
+
+.add-template.container input {
+  margin-bottom: 0.2rem;
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+}
+
+.add-template.table {
+  margin: 1rem auto;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  padding: 0;
+}
+
+.add-template.table th {
+  border-bottom: 2px solid #fff;
+}
+
+.add-template.table tbody tr:nth-of-type(odd) {
+  background-color: rgb(53, 53, 53);
+}
+.add-template.table tbody tr:nth-of-type(even) {
+  background-color: rgb(22, 22, 22);
+}
+.add-template.save {
+  display: block;
+  margin: auto;
+}

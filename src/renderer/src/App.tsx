@@ -1,28 +1,35 @@
 import { useState } from 'react'
+import { ToastContainer } from 'react-toastify'
+import AddTemplate from './components/AddTemplate'
+import CompareBoms from './components/CompareBoms'
+import DeleteTemplate from './components/EditBom'
+import EditTemplate from './components/EditTemplate'
+import Home from './components/Home'
+import Nav from './components/Nav'
+import ViewBoms from './components/ViewBoms'
 
 function App(): JSX.Element {
-  const [dir, setDir] = useState<string | null>(null)
+  const [scene, setScene] = useState(1)
+  // const [dir, setDir] = useState<string | null>(null)
 
-  const getDir = async () => {
-    const dir = await window.context.getDir('template')
-    setDir(dir)
-    setTimeout(() => setDir(null), 1000 * 3)
-  }
+  // const getDir = async () => {
+  //   const dir = await window.context.getDir('template')
+  //   setDir(dir)
+  //   setTimeout(() => setDir(null), 1000 * 3)
+  // }
 
   return (
     <>
-      {dir && <p>Directory: {dir}</p>}
-
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={getDir}>
-            get template directory
-          </a>
-        </div>
-      </div>
+      <ToastContainer />
+      <Nav setScene={setScene} />
+      <main>
+        {scene === 0 && <Home />}
+        {scene === 1 && <AddTemplate />}
+        {scene === 2 && <DeleteTemplate />}
+        {scene === 3 && <EditTemplate />}
+        {scene === 4 && <CompareBoms />}
+        {scene === 5 && <ViewBoms />}
+      </main>
     </>
   )
 }
