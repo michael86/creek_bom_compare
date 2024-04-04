@@ -1,102 +1,48 @@
 {
-  "name": "basic-electron-react-typescript",
-  "author": "Caio Lucas <lienscarlet@gmail.com>",
+  "name": "creek_bom_converter",
   "version": "1.0.0",
-  "description": "Boilerplate using Electron + TypeScript + React.",
-  "main": "./.webpack/main",
+  "description": "An Electron application with React and TypeScript",
+  "main": "./out/main/index.js",
+  "author": "example.com",
+  "homepage": "https://electron-vite.org",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "release": "electron-forge publish"
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev",
+    "build": "npm run typecheck && electron-vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "electron-vite build && electron-builder --mac",
+    "build:linux": "electron-vite build && electron-builder --linux"
   },
-  "keywords": [],
-  "license": "MIT",
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-hot-loader": "^4.13.0"
+    "@electron-toolkit/preload": "^3.0.0",
+    "@electron-toolkit/utils": "^3.0.0",
+    "fs-extra": "^11.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.8",
-    "@babel/plugin-transform-runtime": "^7.17.0",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-react": "^7.16.7",
-    "@babel/preset-typescript": "^7.16.7",
-    "@electron-forge/cli": "^6.0.0-beta.63",
-    "@electron-forge/maker-deb": "^6.0.0-beta.63",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
-    "@electron-forge/maker-zip": "^6.0.0-beta.63",
-    "@electron-forge/plugin-webpack": "^6.0.0-beta.63",
-    "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
-    "@types/electron-devtools-installer": "2.2.0",
-    "@types/react": "^17.0.42",
-    "@types/react-dom": "^17.0.14",
-    "babel-loader": "^8.2.4",
-    "cross-env": "^7.0.3",
-    "css-loader": "^6.7.1",
-    "electron": "^17.2.0",
-    "file-loader": "^6.2.0",
-    "npm-run-all": "^4.1.5",
-    "style-loader": "^3.3.1",
-    "typescript": "^4.6.2",
-    "wait-on": "^6.0.1",
-    "webpack": "^5.70.0"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "name": "Electron starter",
-        "executableName": "electron-starter",
-        "icon": "assets/icon",
-        "extraResource": [
-          "assets"
-        ]
-      },
-      "plugins": [
-        [
-          "@electron-forge/plugin-webpack",
-          {
-            "mainConfig": "./webpack/main.webpack.js",
-            "renderer": {
-              "config": "./webpack/renderer.webpack.js",
-              "entryPoints": [
-                {
-                  "html": "./public/index.html",
-                  "js": "./src/index.tsx",
-                  "name": "main_window",
-                  "preload": {
-                    "js": "./electron/bridge.ts"
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      ],
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "Electron Starter"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
-      ]
-    }
+    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
+    "@electron-toolkit/eslint-config-ts": "^1.0.1",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@types/node": "^18.19.9",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.1",
+    "electron-vite": "^2.0.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "lodash": "^4.17.21",
+    "prettier": "^3.2.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
   }
 }
