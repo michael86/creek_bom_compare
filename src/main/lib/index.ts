@@ -9,9 +9,6 @@ export const saveTemplate = async (data: TableSchema[], name: string) => {
   try {
     const dir = getDir(templateDir)
     await ensureDir(dir)
-    console.log('dir ', dir)
-
-    console.log('name ', name)
 
     const file = path.join(dir, `${name}.json`)
 

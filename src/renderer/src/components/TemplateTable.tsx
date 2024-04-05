@@ -1,15 +1,17 @@
 import { TableSchema } from '@shared/types'
+import TableRow from './TableRow'
 
 type Props = {
   onClick: React.MouseEventHandler<HTMLButtonElement>
   tableNames: TableSchema[]
   edit?: boolean
-  innerRef?: React.RefObject<HTMLTableElement>
+  inputRef?: React.RefObject<HTMLTableRowElement[]>
 }
-const TemplateTable: React.FC<Props> = ({ onClick, tableNames, edit = false, innerRef }) => {
+
+const TemplateTable: React.FC<Props> = ({ onClick, tableNames, edit, inputRef }) => {
   return (
     <>
-      <table className="add-template table" ref={innerRef}>
+      <table className="add-template table">
         <thead>
           <tr>
             <th>Name</th>
@@ -19,28 +21,14 @@ const TemplateTable: React.FC<Props> = ({ onClick, tableNames, edit = false, inn
         </thead>
         <tbody>
           {tableNames.map((header, index) => (
-            <tr key={index}>
-              <td>
-                {edit ? (
-                  <input type="text" name="name" id="name" placeholder={header.name} />
-                ) : (
-                  header.name
-                )}
-              </td>
-              <td>
-                {edit ? (
-                  <input type="text" name="col" id="col" placeholder={header.col} />
-                ) : (
-                  header.col
-                )}
-              </td>
-              <td>
-                {edit ? (
-                  <input type="text" name="row" id="row" placeholder={header.row} />
-                ) : (
-                  header.row
-                )}
-              </td>
+            <tr
+              key={index}
+              ref={(el) => {
+                if (!inputRef?.current || !el) return
+                inputRef.current.push(el)
+              }}
+            >
+              <TableRow header={header} edit={edit} />
             </tr>
           ))}
         </tbody>

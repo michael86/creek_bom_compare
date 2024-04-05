@@ -11,38 +11,58 @@ const EditTemplate = () => {
   const [template, setTemplate] = useState<TableSchema[] | undefined>(undefined)
 
   const selectRef = useRef<HTMLSelectElement | null>(null)
-  const tableRef = useRef<HTMLTableElement | null>(null)
+  const inputRef = useRef<HTMLTableRowElement[]>([])
 
   useEffect(() => {
     ;(async () => setFiles(await fetchFiles()))()
   }, [setFiles, fetchFiles])
 
-  const onViewTemplate = async () => {
+  const onViewTemplate = async (spread = false) => {
     if (!selectRef.current || !selectRef.current.value) return
     const name = selectRef.current.value
     setFile(name)
     const table = await window.context.fetchTemplate(name)
-    setTemplate(table)
+    setTemplate(spread ? structuredClone(table) : table)
   }
 
   const onClick = async () => {
-    const handleError = () => toast.error(`Error Editing ${file}`)
-    if (!files?.length || !file || !template || !tableRef.current) return
-
-    const headers = tableRef.current.children[0].children[0].children
-    const columns = tableRef.current.children[1].children
-
-    if (!headers || !columns) {
-      handleError()
-      return
-    }
-    const saved = await window.context.saveTemplate(template, file)
-    if (!saved) {
-      handleError()
+    if (!files?.length || !file || !template || !inputRef.current) {
       return
     }
 
-    toast.success(`${file} saved succesfully`)
+    // Map table rows and extract data from inputs
+    const tableRows = inputRef.current.map((td) => [...td.children])
+
+    const data = tableRows.map((td) =>
+      td.map((t) =>
+        [...t.children]
+          .map(
+            (input) => (input as HTMLInputElement).value || (input as HTMLInputElement).placeholder
+          )
+          .join()
+      )
+    )
+
+    // Convert data to new template format
+    const newTemplate = data.map((entry) => ({ name: entry[0], col: entry[1], row: entry[2] }))
+
+    // Check if new template is empty
+    if (!newTemplate.length) {
+      toast.error(`Error Editing ${file}`)
+      return
+    }
+
+    // Save the new template
+    const saved = await window.context.saveTemplate(newTemplate, file)
+
+    // Show success or error message
+    if (saved) {
+      toast.success(`${file} saved successfully`)
+      onViewTemplate(true)
+    } else {
+      toast.error(`Error Editing ${file}`)
+    }
+    inputRef.current = []
   }
 
   return (
@@ -52,14 +72,14 @@ const EditTemplate = () => {
         (files.length > 0 ? (
           <>
             <SelectTemplate files={files} innerRef={selectRef} />
-            <button onClick={onViewTemplate}>View Template</button>
+            <button onClick={() => onViewTemplate()}>View Template</button>
 
             {template && (
               <TemplateTable
                 tableNames={template}
                 onClick={onClick}
                 edit={true}
-                innerRef={tableRef}
+                inputRef={inputRef}
               />
             )}
           </>
