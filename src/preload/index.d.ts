@@ -3,7 +3,8 @@ import {
   FetchTemplate,
   FetchTemplateNames,
   GetDir,
-  SaveTemplate
+  SaveTemplate,
+  TestTemplate
 } from '@shared/types'
 
 declare global {
@@ -16,6 +17,7 @@ declare global {
       fetchTemplateNames: FetchTemplateNames
       deleteTemplate: DeleteTemplate
       fetchTemplate: FetchTemplate
+      testTemplate: TestTemplate
     }
   }
 }

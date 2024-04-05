@@ -34,13 +34,14 @@ const Nav: React.FC<Props> = ({ setScene }) => {
               <li onClick={() => setScene(1)}>Add</li>
               <li onClick={() => setScene(2)}>Delete</li>
               <li onClick={() => setScene(3)}>Edit</li>
+              <li onClick={() => setScene(4)}>test</li>
             </ul>
           </li>
           <li onMouseEnter={() => onMouseEnter('boms')} onMouseLeave={() => onMouseLeave('boms')}>
             <p>Boms</p>
             <ul className={`nav-child ${show.boms ? ' show' : ''}`}>
-              <li onClick={() => setScene(4)}>Compare</li>
-              <li onClick={() => setScene(5)}>View</li>
+              <li onClick={() => setScene(5)}>Compare</li>
+              <li onClick={() => setScene(6)}>View</li>
             </ul>
           </li>
         </ul>

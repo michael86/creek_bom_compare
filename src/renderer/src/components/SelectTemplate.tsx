@@ -1,6 +1,6 @@
 import React from 'react'
 
-type Props = { innerRef: React.RefObject<HTMLSelectElement>; files: string[] }
+type Props = { innerRef?: React.RefObject<HTMLSelectElement>; files: string[] }
 const SelectTemplate: React.FC<Props> = ({ innerRef, files }) => {
   return (
     <select name="templates" id="templates" ref={innerRef}>

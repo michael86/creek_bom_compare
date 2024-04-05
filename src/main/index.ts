@@ -4,6 +4,7 @@ import { TableSchema } from '@shared/types'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+import { testTemplate } from './lib/testTemplate'
 
 function createWindow(): void {
   // Create the browser window.
@@ -60,6 +61,7 @@ app.whenReady().then(() => {
   ipcMain.handle('fetchTemplateNames', (_) => fetchTemplateNames())
   ipcMain.handle('deleteTemplate', (_, name) => deleteTemplate(name))
   ipcMain.handle('fetchTemplate', (_, name) => fetchTemplate(name))
+  ipcMain.handle('testTemplate', (_, template, file) => testTemplate(template, file))
 
   createWindow()
 

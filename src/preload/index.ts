@@ -13,7 +13,8 @@ try {
       ipcRenderer.invoke('saveTemplate', data, name),
     fetchTemplateNames: (name?: string) => ipcRenderer.invoke('fetchTemplateNames', name),
     deleteTemplate: (name) => ipcRenderer.invoke('deleteTemplate', name),
-    fetchTemplate: (name) => ipcRenderer.invoke('fetchTemplate', name)
+    fetchTemplate: (name) => ipcRenderer.invoke('fetchTemplate', name),
+    testTemplate: (template, file) => ipcRenderer.invoke('testTemplate', template, file)
   })
 } catch (error) {
   console.error(error)

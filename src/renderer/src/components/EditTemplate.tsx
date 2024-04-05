@@ -8,6 +8,7 @@ import TemplateTable from './TemplateTable'
 const EditTemplate = () => {
   const [files, setFiles] = useState<string[] | null>(null)
   const [file, setFile] = useState<string | null>(null)
+
   const [template, setTemplate] = useState<TableSchema[] | undefined>(undefined)
 
   const selectRef = useRef<HTMLSelectElement | null>(null)

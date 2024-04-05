@@ -1,7 +1,14 @@
 import { PATH, fileEncoding, templateDir } from '@shared/constants'
-import { DeleteTemplate, FetchTemplate, FetchTemplateNames, TableSchema } from '@shared/types'
+import {
+  DeleteTemplate,
+  FetchTemplate,
+  FetchTemplateNames,
+  TableSchema,
+  TestTemplate
+} from '@shared/types'
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
+import { readFile } from 'xlsx'
 
 export const getDir = (dir: string) => `${PATH}\\${dir}`
 
@@ -73,6 +80,38 @@ export const fetchTemplate: FetchTemplate = async (name) => {
     return JSON.parse(data)
   } catch (error) {
     console.error(error)
+
     return
+  }
+}
+
+export const testTemplate: TestTemplate = async (template, file) => {
+  try {
+    const templateSchema = await fetchTemplate(template)
+    if (!templateSchema) throw new Error(`Failed to fetchTemplate`)
+
+    const fileData = readFile(file)
+    const sheets = Object.keys(fileData.Sheets)
+
+    for (const sheet of sheets) {
+      console.log('Processing sheet: ', sheet)
+      const sheetData = fileData.Sheets[sheet]
+
+      for (const entry of templateSchema) {
+        const { col, row, name } = entry
+        const cell = `${col.toUpperCase()}${row}`
+        const value = sheetData[cell]
+        if (!value.includes(name)) {
+          return false
+        }
+        console.log(`comparing ${cell}`)
+        console.log('sheetData[cell] ', sheetData[cell].includes(name.toLowerCase()))
+      }
+    }
+
+    return true
+  } catch (error) {
+    console.error(error)
+    return false
   }
 }
