@@ -3,12 +3,6 @@
   padding-top: 2rem;
 }
 
-.delete-template-container select {
-  display: block;
-  margin: auto;
-  margin: 1rem auto 1rem auto;
-}
-
 .delete-template-container button:hover {
   cursor: pointer;
 }

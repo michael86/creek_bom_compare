@@ -1,6 +1,8 @@
 import { fetchFiles } from '@renderer/utils'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
+import infoImage from '../assets/icons8-info-48.png'
+import '../assets/test_template.css'
 import SelectTemplate from './SelectTemplate'
 
 const TestTemplate = () => {
@@ -8,6 +10,8 @@ const TestTemplate = () => {
   const templateRef = useRef<HTMLSelectElement | null>(null)
   const fileRef = useRef<HTMLInputElement | null>(null)
   const autoFind = useRef<HTMLInputElement | null>(null)
+
+  const [showInfo, setShowInfo] = useState<boolean>()
 
   useEffect(() => {
     ;(async () => setFiles(await fetchFiles()))()
@@ -54,35 +58,48 @@ const TestTemplate = () => {
     return () => window.context.onRemoveTestTemplate()
   }, [])
 
+  const onMouseEnter = () => setShowInfo(true)
+  const onMouseLeave = () => setShowInfo(false)
+
   return (
-    <>
-      <h2>Test files</h2>
+    <div className="test-template-container">
+      <div className="test-template-header">
+        <h2>Test files</h2>
+        <img src={infoImage} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
+      </div>
       {files && (
         <>
           <div>
             <SelectTemplate files={files} innerRef={templateRef} />
           </div>
-          <div>
-            <input
-              id="test-file"
-              type="file"
-              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-              ref={fileRef}
-            />
-          </div>
-          <div>
-            <label htmlFor="auto-find">Auto find table</label>
-            <input type="checkbox" name="auto-find" id="auto-find" ref={autoFind} />
-            <div>
-              <small>
-                Enabling this will attempt to find the table if the selected template fails
-              </small>
-            </div>
-          </div>
+
+          <input
+            id="test-file"
+            type="file"
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            ref={fileRef}
+          />
+
+          <label htmlFor="auto-find">Auto find table</label>
+          <input type="checkbox" name="auto-find" id="auto-find" ref={autoFind} />
+
           <button onClick={onClick}>Test</button>
         </>
       )}
-    </>
+      {showInfo && (
+        <>
+          <p>This is to ensure your templates find the table in the selected template.</p>
+          <p>To use, select the template required, and the file you want to test</p>
+          <p>Click test, and await the results</p>
+          <p>
+            If the test fails, try enabling <span>auto find</span>. This will attempt to
+            automatically find the table headings. If succesful, it will automatically update the
+            table locations in the file.
+          </p>
+          <p>This helps when boms have a revision and the table row has changed</p>
+        </>
+      )}
+    </div>
   )
 }
 

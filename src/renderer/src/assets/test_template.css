@@ -1,0 +1,32 @@
+.test-template-container {
+  text-align: center;
+}
+
+.test-template-header {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  margin: 2rem auto 1rem auto;
+}
+
+.test-template-header img:hover {
+  cursor: pointer;
+}
+
+.test-template-header :first-child {
+  margin-right: 0.5rem;
+}
+
+#auto-find {
+  margin-left: 0.5rem;
+}
+
+.test-template-container button {
+  display: block;
+  margin: 1rem auto;
+  width: 10rem;
+}
+
+.test-template-container span {
+  color: red;
+}
