@@ -6,6 +6,7 @@ nav ul {
   flex-direction: row;
   list-style: none;
   text-align: center;
+  z-index: 9999999;
 }
 
 nav ul li {
