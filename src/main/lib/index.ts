@@ -4,11 +4,13 @@ import {
   FetchTemplate,
   FetchTemplateNames,
   TableSchema,
-  TestTemplate
+  TestTemplate,
+  XLSXCell
 } from '@shared/types'
+import { BrowserWindow } from 'electron'
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
-import { readFile } from 'xlsx'
+import { WorkSheet, readFile } from 'xlsx'
 
 export const getDir = (dir: string) => `${PATH}\\${dir}`
 
@@ -85,28 +87,61 @@ export const fetchTemplate: FetchTemplate = async (name) => {
   }
 }
 
-export const testTemplate: TestTemplate = async (template, file) => {
+export const _findCell = (name: string, sheetData: WorkSheet) => {
+  const lowercaseName = name.toLowerCase()
+
+  for (const [cell, cellValue] of Object.entries(sheetData)) {
+    if (!cellValue?.v) continue
+    const value = String(cellValue.v).toLowerCase()
+
+    if (value === lowercaseName) {
+      console.log(`Found table ${cellValue.v} at ${cell}`)
+      return { value, cell }
+    }
+  }
+
+  return
+}
+
+export const testTemplate: TestTemplate = async (template, file, autoFind) => {
   try {
-    const templateSchema = await fetchTemplate(template)
-    if (!templateSchema) throw new Error(`Failed to fetchTemplate`)
+    console.log('file ', file)
+    const [templateSchema, fileData] = await Promise.all([fetchTemplate(template), readFile(file)])
+    if (!templateSchema || !fileData) throw new Error(`Failed to fetchTemplate or filedata`)
 
-    const fileData = readFile(file)
-    const sheets = Object.keys(fileData.Sheets)
+    const newTable: { [key: string]: string } = {}
 
-    for (const sheet of sheets) {
-      console.log('Processing sheet: ', sheet)
-      const sheetData = fileData.Sheets[sheet]
+    for (const [sheet, sheetData] of Object.entries(fileData.Sheets)) {
+      console.log('Processing sheet:', sheet)
 
-      for (const entry of templateSchema) {
-        const { col, row, name } = entry
-        const cell = `${col.toUpperCase()}${row}`
-        const value = sheetData[cell]
-        if (!value.includes(name)) {
+      for (const { col, row, name } of templateSchema) {
+        const lowercaseName = name.toLowerCase()
+        const coords = `${col.toUpperCase()}${row}`
+        const cell: XLSXCell = sheetData[coords]
+        const value = String(cell?.v).toLowerCase()
+
+        if (!value || value !== lowercaseName) {
+          if (autoFind) {
+            const newCoords = _findCell(lowercaseName, sheetData)
+
+            if (!newCoords) return false
+            newTable[newCoords.cell] = newCoords.value
+            continue
+          }
+
           return false
         }
-        console.log(`comparing ${cell}`)
-        console.log('sheetData[cell] ', sheetData[cell].includes(name.toLowerCase()))
       }
+    }
+
+    if (Object.keys(newTable).length) {
+      const newData: TableSchema[] = []
+
+      for (const [key, entry] of Object.entries(newTable)) {
+        newData.push({ name: entry, col: key[0], row: key.substring(1, key.length) })
+      }
+      const mainWindow = BrowserWindow.getFocusedWindow()
+      mainWindow?.webContents.send('testTemplateResult', newData)
     }
 
     return true

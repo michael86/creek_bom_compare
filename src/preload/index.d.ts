@@ -18,6 +18,8 @@ declare global {
       deleteTemplate: DeleteTemplate
       fetchTemplate: FetchTemplate
       testTemplate: TestTemplate
+      onTestTemplateResult: (boolean) => void
+      onRemoveTestTemplate: () => void
     }
   }
 }

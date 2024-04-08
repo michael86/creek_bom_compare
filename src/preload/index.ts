@@ -1,4 +1,3 @@
-import { TableSchema } from '@shared/types'
 import { contextBridge, ipcRenderer } from 'electron'
 
 if (!process.contextIsolated) {
@@ -8,13 +7,22 @@ if (!process.contextIsolated) {
 try {
   contextBridge.exposeInMainWorld('context', {
     locale: navigator.language,
-    getDir: (dir: string) => ipcRenderer.invoke('getDir', dir),
-    saveTemplate: (data: TableSchema[], name: string) =>
-      ipcRenderer.invoke('saveTemplate', data, name),
-    fetchTemplateNames: (name?: string) => ipcRenderer.invoke('fetchTemplateNames', name),
+    getDir: (dir) => ipcRenderer.invoke('getDir', dir),
+    saveTemplate: (data, name) => ipcRenderer.invoke('saveTemplate', data, name),
+    fetchTemplateNames: (name?) => ipcRenderer.invoke('fetchTemplateNames', name),
     deleteTemplate: (name) => ipcRenderer.invoke('deleteTemplate', name),
     fetchTemplate: (name) => ipcRenderer.invoke('fetchTemplate', name),
-    testTemplate: (template, file) => ipcRenderer.invoke('testTemplate', template, file)
+    testTemplate: (template, file, autoFind) =>
+      ipcRenderer.invoke('testTemplate', template, file, autoFind),
+    onTestTemplateResult: (callback) => {
+      ipcRenderer.on('testTemplateResult', (_, valid) => {
+        callback(valid)
+      })
+    },
+    onRemoveTestTemplate: () => {
+      console.log('removed listener')
+      ipcRenderer.removeAllListeners('testTemplateResult')
+    }
   })
 } catch (error) {
   console.error(error)

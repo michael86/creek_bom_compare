@@ -1,14 +1,22 @@
-import { deleteTemplate, fetchTemplate, fetchTemplateNames, getDir, saveTemplate } from '@/lib'
+import {
+  deleteTemplate,
+  fetchTemplate,
+  fetchTemplateNames,
+  getDir,
+  saveTemplate,
+  testTemplate
+} from '@/lib'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { TableSchema } from '@shared/types'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
-import { testTemplate } from './lib/testTemplate'
+
+let mainWindow
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -18,7 +26,9 @@ function createWindow(): void {
     title: 'Creekview BOM Comparison tool',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
+      nodeIntegration: false,
       sandbox: true,
+
       contextIsolation: true
     }
   })
@@ -61,7 +71,9 @@ app.whenReady().then(() => {
   ipcMain.handle('fetchTemplateNames', (_) => fetchTemplateNames())
   ipcMain.handle('deleteTemplate', (_, name) => deleteTemplate(name))
   ipcMain.handle('fetchTemplate', (_, name) => fetchTemplate(name))
-  ipcMain.handle('testTemplate', (_, template, file) => testTemplate(template, file))
+  ipcMain.handle('testTemplate', (_, template, file, autoFind) =>
+    testTemplate(template, file, autoFind)
+  )
 
   createWindow()
 
