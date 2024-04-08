@@ -150,3 +150,9 @@ export const testTemplate: TestTemplate = async (template, file, autoFind) => {
     return false
   }
 }
+
+export const compareBoms = (fileOne, fileTwo, template) => {
+  console.log('fileOne ', fileOne)
+  console.log('fileTwo ', fileTwo)
+  console.log('template ', template)
+}

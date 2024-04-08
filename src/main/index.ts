@@ -1,4 +1,5 @@
 import {
+  compareBoms,
   deleteTemplate,
   fetchTemplate,
   fetchTemplateNames,
@@ -73,6 +74,9 @@ app.whenReady().then(() => {
   ipcMain.handle('fetchTemplate', (_, name) => fetchTemplate(name))
   ipcMain.handle('testTemplate', (_, template, file, autoFind) =>
     testTemplate(template, file, autoFind)
+  )
+  ipcMain.handle('compareBoms', (_, fileOne, fileTwo, template) =>
+    compareBoms(fileOne, fileTwo, template)
   )
 
   createWindow()

@@ -1,0 +1,15 @@
+.compare-boms-container {
+  padding-top: 2rem;
+  text-align: center;
+}
+
+.compare-boms-container .input-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.compare-boms-container .input-container label {
+  display: flex;
+  transform: translateX(4rem);
+}

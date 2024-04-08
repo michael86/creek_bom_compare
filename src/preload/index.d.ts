@@ -1,4 +1,5 @@
 import {
+  CompareBoms,
   DeleteTemplate,
   FetchTemplate,
   FetchTemplateNames,
@@ -20,6 +21,7 @@ declare global {
       testTemplate: TestTemplate
       onTestTemplateResult: (boolean) => void
       onRemoveTestTemplate: () => void
+      compareBoms: CompareBoms
     }
   }
 }

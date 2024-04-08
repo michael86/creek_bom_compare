@@ -7,7 +7,6 @@ import EditTemplate from './components/EditTemplate'
 import Home from './components/Home'
 import Nav from './components/Nav'
 import TestTemplate from './components/TestTemplate'
-import ViewBoms from './components/ViewBoms'
 
 function App(): JSX.Element {
   const [scene, setScene] = useState(1)
@@ -23,7 +22,6 @@ function App(): JSX.Element {
         {scene === 3 && <EditTemplate />}
         {scene === 4 && <TestTemplate />}
         {scene === 5 && <CompareBoms />}
-        {scene === 6 && <ViewBoms />}
       </main>
     </>
   )

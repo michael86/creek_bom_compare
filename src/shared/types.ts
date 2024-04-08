@@ -7,6 +7,8 @@ export type DeleteTemplate = (name: string) => Promise<boolean>
 export type FetchTemplate = (name: string) => Promise<TableSchema[] | undefined>
 export type TestTemplate = (template: string, file: string, autoFind: boolean) => Promise<boolean>
 export type OnTestTemplateResult = (callback: (valid: boolean) => void) => void
+export type CompareBoms = (fileOne: string, fileTwo: string, template: string) => void
+
 export type XLSXCell =
   | {
       t?: string | number

@@ -22,6 +22,9 @@ try {
     onRemoveTestTemplate: () => {
       console.log('removed listener')
       ipcRenderer.removeAllListeners('testTemplateResult')
+    },
+    compareBoms: (fileOne, fileTwo, template) => {
+      ipcRenderer.invoke('compareBoms', fileOne, fileTwo, template)
     }
   })
 } catch (error) {
