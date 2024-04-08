@@ -1,0 +1,20 @@
+.delete-template-container {
+  text-align: center;
+  padding-top: 2rem;
+}
+
+.delete-template-container select {
+  display: block;
+  margin: auto;
+  margin: 1rem auto 1rem auto;
+}
+
+.delete-template-container button:hover {
+  cursor: pointer;
+}
+
+.delete-template-container span {
+  color: red;
+  font-size: 2.5rem;
+  display: block;
+}

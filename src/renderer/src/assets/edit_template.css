@@ -1,0 +1,22 @@
+.edit-template-container {
+  text-align: center;
+}
+
+.edit-template-container select {
+  display: block;
+  margin: 1rem auto;
+}
+
+.edit-template-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.edit-template-header :first-child {
+  margin-right: 0.5rem;
+}
+
+.edit-template-header img:hover {
+  cursor: pointer;
+}

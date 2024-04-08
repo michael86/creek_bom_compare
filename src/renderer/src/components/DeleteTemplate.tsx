@@ -1,6 +1,7 @@
 import { fetchFiles } from '@renderer/utils'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
+import '../assets/delete_template.css'
 import SelectTemplate from './SelectTemplate'
 
 const DeleteTemplate = () => {
@@ -31,7 +32,7 @@ const DeleteTemplate = () => {
   }
 
   return (
-    <>
+    <div className="delete-template-container">
       <h2>Delete Template</h2>
       {files && (
         <>
@@ -39,13 +40,16 @@ const DeleteTemplate = () => {
             <>
               <SelectTemplate innerRef={select} files={files} />
               <button onClick={onClick}>Delete Template</button>
+              <p>
+                <span>Warning</span> deleting a template is permenent and can't be undone.
+              </p>
             </>
           ) : (
             <p>No Templates</p>
           )}
         </>
       )}
-    </>
+    </div>
   )
 }
 
