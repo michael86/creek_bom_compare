@@ -9,8 +9,7 @@ import TemplateTable from './TemplateTable'
 const AddTemplate: React.FC = () => {
   const templateName = useRef<HTMLInputElement>(null)
   const tableHeader = useRef<HTMLInputElement>(null)
-  const tableColumn = useRef<HTMLInputElement>(null)
-  const tableRow = useRef<HTMLInputElement>(null)
+
   const [tableNames, setTableNames] = useState<TableSchema[]>([])
   const [showInfo, setShowInfo] = useState<boolean>(false)
 
@@ -18,13 +17,11 @@ const AddTemplate: React.FC = () => {
   const onSubmit: OnSubmit = async (e) => {
     e.preventDefault()
     const { current: name } = tableHeader
-    const { current: col } = tableColumn
-    const { current: row } = tableRow
-    if (!name?.value || !col?.value || !row?.value) return
 
-    setTableNames([...tableNames, { col: col.value, row: row.value, name: name.value }])
-    col.value = ''
-    row.value = ''
+    if (!name?.value) return
+
+    setTableNames([...tableNames, { name: name.value }])
+
     name.value = ''
   }
 
@@ -65,8 +62,6 @@ const AddTemplate: React.FC = () => {
             <input type="text" name="name" id="name" ref={templateName} />
           </div>
           <input type="text" placeholder="Enter Table Header Name" ref={tableHeader} />
-          <input type="text" placeholder="Enter Column" ref={tableColumn} />
-          <input type="text" placeholder="Enter Row" ref={tableRow} />
 
           <button type="button" onClick={onSubmit}>
             Add New Header

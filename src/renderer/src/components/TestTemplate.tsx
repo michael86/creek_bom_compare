@@ -9,7 +9,6 @@ const TestTemplate = () => {
   const [files, setFiles] = useState<string[] | null>(null)
   const templateRef = useRef<HTMLSelectElement | null>(null)
   const fileRef = useRef<HTMLInputElement | null>(null)
-  const autoFind = useRef<HTMLInputElement | null>(null)
 
   const [showInfo, setShowInfo] = useState<boolean>()
 
@@ -18,7 +17,7 @@ const TestTemplate = () => {
   }, [setFiles, fetchFiles])
 
   const onClick = async () => {
-    if (!fileRef.current || !templateRef.current || !autoFind.current) return
+    if (!fileRef.current || !templateRef.current) return
 
     if (!fileRef.current.files) {
       toast.error('No file selected')
@@ -27,8 +26,7 @@ const TestTemplate = () => {
 
     const valid = await window.context.testTemplate(
       templateRef.current.value,
-      fileRef.current.files[0].path,
-      autoFind.current.checked
+      fileRef.current.files[0].path
     )
 
     if (!valid) {
@@ -38,25 +36,6 @@ const TestTemplate = () => {
 
     toast.success('test passed')
   }
-
-  useEffect(() => {
-    window.context.onTestTemplateResult(async (data) => {
-      if (!templateRef.current?.value) {
-        toast.error('Table found, but failed to save. You probably want to contact Michael.')
-        return
-      }
-
-      const file = templateRef.current.value
-      const fileUpdated = await window.context.saveTemplate(data, file)
-      if (!fileUpdated) {
-        toast.error('Table found, but failed to save. You probably want to contact Michael.')
-        return
-      }
-
-      toast.success(`File ${file} auto updated`)
-    })
-    return () => window.context.onRemoveTestTemplate()
-  }, [])
 
   const onMouseEnter = () => setShowInfo(true)
   const onMouseLeave = () => setShowInfo(false)
@@ -80,9 +59,6 @@ const TestTemplate = () => {
             ref={fileRef}
           />
 
-          <label htmlFor="auto-find">Auto find table</label>
-          <input type="checkbox" name="auto-find" id="auto-find" ref={autoFind} />
-
           <button onClick={onClick}>Test</button>
         </>
       )}
@@ -91,12 +67,6 @@ const TestTemplate = () => {
           <p>This is to ensure your templates find the table in the selected template.</p>
           <p>To use, select the template required, and the file you want to test</p>
           <p>Click test, and await the results</p>
-          <p>
-            If the test fails, try enabling <span>auto find</span>. This will attempt to
-            automatically find the table headings. If succesful, it will automatically update the
-            table locations in the file.
-          </p>
-          <p>This helps when boms have a revision and the table row has changed</p>
         </>
       )}
     </div>

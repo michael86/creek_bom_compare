@@ -1,13 +1,12 @@
 import { PATH, fileEncoding, templateDir } from '@shared/constants'
 import {
+  CompareBoms,
   DeleteTemplate,
   FetchTemplate,
   FetchTemplateNames,
   TableSchema,
-  TestTemplate,
-  XLSXCell
+  TestTemplate
 } from '@shared/types'
-import { BrowserWindow } from 'electron'
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
 import { WorkSheet, readFile } from 'xlsx'
@@ -103,45 +102,22 @@ export const _findCell = (name: string, sheetData: WorkSheet) => {
   return
 }
 
-export const testTemplate: TestTemplate = async (template, file, autoFind) => {
+export const testTemplate: TestTemplate = async (template, file) => {
   try {
-    console.log('file ', file)
+    console.log('testing ', file)
     const [templateSchema, fileData] = await Promise.all([fetchTemplate(template), readFile(file)])
     if (!templateSchema || !fileData) throw new Error(`Failed to fetchTemplate or filedata`)
-
-    const newTable: { [key: string]: string } = {}
 
     for (const [sheet, sheetData] of Object.entries(fileData.Sheets)) {
       console.log('Processing sheet:', sheet)
 
-      for (const { col, row, name } of templateSchema) {
+      for (const { name } of templateSchema) {
         const lowercaseName = name.toLowerCase()
-        const coords = `${col.toUpperCase()}${row}`
-        const cell: XLSXCell = sheetData[coords]
-        const value = String(cell?.v).toLowerCase()
 
-        if (!value || value !== lowercaseName) {
-          if (autoFind) {
-            const newCoords = _findCell(lowercaseName, sheetData)
+        const newCoords = _findCell(lowercaseName, sheetData)
 
-            if (!newCoords) return false
-            newTable[newCoords.cell] = newCoords.value
-            continue
-          }
-
-          return false
-        }
+        if (!newCoords) return false
       }
-    }
-
-    if (Object.keys(newTable).length) {
-      const newData: TableSchema[] = []
-
-      for (const [key, entry] of Object.entries(newTable)) {
-        newData.push({ name: entry, col: key[0], row: key.substring(1, key.length) })
-      }
-      const mainWindow = BrowserWindow.getFocusedWindow()
-      mainWindow?.webContents.send('testTemplateResult', newData)
     }
 
     return true
@@ -151,8 +127,16 @@ export const testTemplate: TestTemplate = async (template, file, autoFind) => {
   }
 }
 
-export const compareBoms = (fileOne, fileTwo, template) => {
-  console.log('fileOne ', fileOne)
-  console.log('fileTwo ', fileTwo)
-  console.log('template ', template)
+export const compareBoms: CompareBoms = async (fileOne, fileTwo, template) => {
+  const [templateSchema, fileOneData, fileTwoData] = await Promise.all([
+    fetchTemplate(template),
+    readFile(fileOne),
+    readFile(fileTwo)
+  ])
+
+  if (!templateSchema || !fileOneData || !fileTwoData) return
+  false
+
+  const { Sheets: fileOneSheets } = fileOneData
+  const { Sheets: fileTwoSheets } = fileTwoData
 }

@@ -15,8 +15,6 @@ const TemplateTable: React.FC<Props> = ({ onClick, tableNames, edit, inputRef })
         <thead>
           <tr>
             <th>Name</th>
-            <th>Column</th>
-            <th>Row</th>
           </tr>
         </thead>
         <tbody>
