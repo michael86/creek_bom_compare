@@ -13,11 +13,9 @@ import { BrowserWindow, app, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 
-let mainWindow
-
 function createWindow(): void {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,

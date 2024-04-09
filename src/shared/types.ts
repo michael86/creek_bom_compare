@@ -1,3 +1,5 @@
+import { WorkSheet } from 'xlsx'
+
 export type GetDir = (dir: string) => Promise<string>
 export type SaveTemplate = (data: TableSchema[], name: string) => Promise<boolean>
 export type NavItems = 'templates' | 'boms'
@@ -8,7 +10,11 @@ export type FetchTemplate = (name: string) => Promise<TableSchema[] | undefined>
 export type TestTemplate = (template: string, file: string) => Promise<boolean>
 export type OnTestTemplateResult = (callback: (valid: boolean) => void) => void
 export type CompareBoms = (fileOne: string, fileTwo: string, template: string) => void
-
+export type ExtractTableData = (
+  fileTable: { row: string; col: string; value: string }[],
+  fileData: WorkSheet
+) => NewTableSchema
+export type NewTableSchema = { row: string; col: string; header: string; value: string }[]
 export type XLSXCell =
   | {
       t?: string | number

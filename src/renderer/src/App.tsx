@@ -9,7 +9,7 @@ import Nav from './components/Nav'
 import TestTemplate from './components/TestTemplate'
 
 function App(): JSX.Element {
-  const [scene, setScene] = useState(1)
+  const [scene, setScene] = useState(5)
 
   return (
     <>
