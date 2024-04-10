@@ -6,12 +6,14 @@ import {
   FetchTemplate,
   FetchTemplateNames,
   NewTableSchema,
+  StyledCell,
   TableSchema,
   TestTemplate
 } from '@shared/types'
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
 import XLSX, { WorkSheet, readFile } from 'xlsx-js-style'
+import { fetchXlsxAsAoa, findTableIndex } from '../utils'
 
 export const getDir = (dir: string) => `${PATH}\\${dir}`
 
@@ -173,165 +175,78 @@ export const compareBoms: CompareBoms = async (fileOne, fileTwo, template) => {
   if (!templateSchema || !fileOneData || !fileTwoData) return
   false
 
-  const { Sheets: fileOneSheets } = fileOneData
-  const { Sheets: fileTwoSheets } = fileTwoData
+  const fileOneSheets = Object.keys(fileOneData.Sheets)
+  const fileTwoSheets = Object.keys(fileTwoData.Sheets)
 
-  //Find where tables start in each file
-  // One possible issue to address is if one sheet has multiple worksheets
-  // Address this at a later date
   try {
-    for (const key of Object.keys(fileOneSheets)) {
-      const fileOneData = fileOneSheets[key]
-      const fileOneTable = findTableRow(fileOneData, templateSchema)
-      if (!fileOneTable) throw new Error('Failed to find table row in file one')
+    const finalSheetOne: (string | StyledCell)[][] = []
+    const finalSheetTwo: (string | StyledCell)[][] = []
 
-      const fileTwoData = fileTwoSheets[key]
-      const fileTwoTable = findTableRow(fileTwoData, templateSchema)
-      if (!fileTwoTable) throw new Error('Failed to find table row in file two')
+    for (let i = 0; i < Math.max(fileOneSheets.length, fileTwoSheets.length); i++) {
+      const sheetOne = fileOneSheets[i]
+      const sheetTwo = fileTwoSheets[i]
+      const sheetOneData = fetchXlsxAsAoa(fileOneData, sheetOne)
+      const sheetTwoData = fetchXlsxAsAoa(fileTwoData, sheetTwo)
 
-      const fileOneNewTable = extractTableData(fileOneTable, fileOneData)
-      const fileTwoNewTable = extractTableData(fileTwoTable, fileTwoData)
-      if (!fileOneNewTable || !fileTwoNewTable) throw new Error('Failed to build new tables')
+      const sheetOneTable = findTableIndex(sheetOneData, templateSchema, true)
+      const sheetTwoTable = findTableIndex(sheetTwoData, templateSchema, true)
 
-      //Sort our tables by column placement
-      fileOneTable.sort((a, b) => (a.col > b.col ? 1 : -1))
-      fileTwoTable.sort((a, b) => (a.col > b.col ? 1 : -1))
+      if (typeof sheetOneTable === 'number' || typeof sheetTwoTable === 'number') continue
 
-      //Sort actual data by col placement and then row placement
-      fileOneNewTable
-        .sort((a, b) => (a.col < b.col ? 1 : -1))
-        .sort((a, b) => (a.col === b.col && a.row > b.row ? 1 : -1))
+      const maxTableLength = Math.max(sheetOneTable.length, sheetTwoTable.length)
 
-      fileTwoNewTable
-        .sort((a, b) => (a.col < b.col ? 1 : -1))
-        .sort((a, b) => (a.col === b.col && a.row > b.row ? 1 : -1))
+      for (let index = 0; index < maxTableLength; index++) {
+        const tableOneRow = sheetOneTable[index]
+        const tableTwoRow = sheetTwoTable[index]
+        const newRowOne: (string | StyledCell)[] = [] //to be inserted into finalSheet{respective}
+        const newRowTwo: (string | StyledCell)[] = [] //to be inserted into finalSheet{respective}
 
-      const tableOne = sortObjectsTo2DArray(fileOneNewTable)
-      const tableTwo = sortObjectsTo2DArray(fileTwoNewTable)
-      const [tableOneFormatted, tableTwoFormatted] = convertArraysToXlsxStyle(tableOne, tableTwo)
+        if (tableOneRow?.toString().toLowerCase() !== tableTwoRow?.toString().toLowerCase()) {
+          const cellLength = Math.max(tableOneRow?.length, tableTwoRow?.length)
 
-      writeToXLSXFile([tableOneFormatted, tableTwoFormatted], template)
+          for (let cell = 0; cell < cellLength; cell++) {
+            const newCellOne = {
+              v: tableOneRow[cell],
+              t: 's',
+              s: { fill: { fgColor: { rgb: '32cd32' } } }
+            }
+            const newCellTwo = {
+              v: tableTwoRow[cell],
+              t: 's',
+              s: { fill: { fgColor: { rgb: '32cd32' } } }
+            }
+
+            newRowOne.push(newCellOne)
+            newRowTwo.push(newCellTwo)
+          }
+
+          finalSheetOne.push(newRowOne)
+          finalSheetTwo.push(newRowTwo)
+        } else {
+          //if match then just insert, no change needed
+          finalSheetOne.push(tableOneRow)
+          finalSheetTwo.push(tableTwoRow)
+        }
+      }
     }
+
+    return writeToXLSXFile(
+      [XLSX.utils.aoa_to_sheet(finalSheetOne), XLSX.utils.aoa_to_sheet(finalSheetTwo)],
+      'test'
+    )
   } catch (error) {
     console.error(error)
     return false
   }
 }
 
-// export const compareToXLSX = (tableOne, tableTwo) => {
-//   const highest = tableOne.length >= tableTwo.length ? 'one' : 'two'
-
-//   const formattedFileOne: (string | { v: string; t: string; s: any })[][] = []
-//   const formattedFileTwo: (string | { v: string; t: string; s: any })[][] = []
-
-//   for (let i = 0; i < Math.max(tableOne.length, tableTwo.length); i++) {
-//     if (highest === 'one') {
-//       if (tableOne[i]?.toString() === tableTwo[i]?.toString()) {
-//         formattedFileOne.push(tableOne[i])
-//         formattedFileTwo.push(tableTwo[i])
-//         continue
-//       }
-
-//       const fileOneNewRow: { v: string; t: string; s: any }[] = []
-//       const fileTwoNewRow: { v: string; t: string; s: any }[] = []
-
-//       for (let o = 0; o < Math.max(tableOne[i]?.length, tableTwo[i]?.length); o++) {
-//         const style =
-//           tableOne[i][o]?.v !== tableTwo[i][o]?.v ? { fill: { fgColor: { rgb: 'FF0000' } } } : {}
-
-//         const entryFileOne = { ...tableOne[i][o], s: { ...style } }
-//         const entryFileTwo = { ...tableTwo[i][o], s: { ...style } }
-
-//         fileOneNewRow.push(entryFileOne)
-//         fileTwoNewRow.push(entryFileTwo)
-//       }
-
-//       formattedFileOne.push(fileOneNewRow)
-//       formattedFileTwo.push(fileTwoNewRow)
-//     }
-//   }
-
-//   return [formattedFileOne, formattedFileTwo]
-// }
-
-export const writeToXLSXFile = (tables: any[][], fileName: string) => {
+export const writeToXLSXFile = (sheets: [WorkSheet, WorkSheet], fileName: string) => {
   const workbook = XLSX.utils.book_new()
-  for (let i = 0; i < tables.length; i++) {
-    const ws = XLSX.utils.aoa_to_sheet(tables[i])
-    XLSX.utils.book_append_sheet(workbook, ws, `${fileName}-${i}`)
-  }
+
+  for (let i = 0; i < sheets.length; i++)
+    XLSX.utils.book_append_sheet(workbook, sheets[i], `${fileName}-${i}`)
 
   XLSX.writeFile(workbook, `C:\\Users\\micha\\Desktop\\${fileName}-${Date.now()}.xlsx`)
   console.log('file created')
-}
-
-function sortObjectsTo2DArray(objects: NewTableSchema): string[][] {
-  // Find the minimum row and column values
-  const minRow = Math.min(...objects.map((obj) => parseInt(obj.row)))
-  const minCol = Math.min(...objects.map((obj) => obj.col.charCodeAt(0) - 'A'.charCodeAt(0)))
-
-  // Adjust the row and column indices to start at 1 and 'A', respectively
-  const result: string[][] = []
-
-  for (const obj of objects) {
-    const rowIndex = parseInt(obj.row) - minRow
-    const colIndex = obj.col.charCodeAt(0) - 'A'.charCodeAt(0) - minCol
-
-    // Ensure the row index is within the bounds of the result array
-    while (result.length <= rowIndex) {
-      result.push([])
-    }
-
-    // Fill any empty columns with empty strings
-    while (result[rowIndex].length < colIndex) {
-      result[rowIndex].push('')
-    }
-
-    // Insert the value into the appropriate position
-    result[rowIndex][colIndex] = obj.value
-  }
-
-  return result
-}
-function convertArraysToXlsxStyle(arr1, arr2) {
-  const maxLength = Math.max(arr1.length, arr2.length)
-  const convertedArr1 = []
-  const convertedArr2 = []
-
-  for (let i = 0; i < maxLength; i++) {
-    const row1 = arr1[i] || []
-    const row2 = arr2[i] || []
-    const convertedRow1 = []
-    const convertedRow2 = []
-
-    for (let j = 0; j < Math.max(row1.length, row2.length); j++) {
-      const value1 = row1[j]
-      const value2 = row2[j]
-
-      if (value1 !== value2) {
-        const modifiedValue1 = { v: value1, t: 's' }
-        const modifiedValue2 = { v: value2, t: 's' }
-        if (i < arr1.length && j < row1.length) {
-          modifiedValue1.s = { fill: { fgColor: { rgb: 'FF000' } } }
-          convertedRow1.push(modifiedValue1)
-        } else {
-          convertedRow1.push(value1)
-        }
-        if (i < arr2.length && j < row2.length) {
-          modifiedValue2.s = { fill: { fgColor: { rgb: 'FF000' } } }
-          convertedRow2.push(modifiedValue2)
-        } else {
-          convertedRow2.push(value2)
-        }
-      } else {
-        convertedRow1.push(value1)
-        convertedRow2.push(value2)
-      }
-    }
-
-    convertedArr1.push(convertedRow1)
-    convertedArr2.push(convertedRow2)
-  }
-
-  return [convertedArr1, convertedArr2]
+  return true
 }

@@ -1,4 +1,4 @@
-import { WorkSheet } from 'xlsx'
+import { WorkBook, WorkSheet } from 'xlsx-js-style'
 
 export type GetDir = (dir: string) => Promise<string>
 export type SaveTemplate = (data: TableSchema[], name: string) => Promise<boolean>
@@ -10,6 +10,12 @@ export type FetchTemplate = (name: string) => Promise<TableSchema[] | undefined>
 export type TestTemplate = (template: string, file: string) => Promise<boolean>
 export type OnTestTemplateResult = (callback: (valid: boolean) => void) => void
 export type CompareBoms = (fileOne: string, fileTwo: string, template: string) => void
+export type FetchXlsxAsAoa = (wb: WorkBook, sheet: string) => WorkSheet
+export type FindTableIndex = (
+  arr: WorkSheet,
+  template: TableSchema[],
+  splice?: boolean
+) => string[][] | number
 export type ExtractTableData = (
   fileTable: { row: string; col: string; value: string }[],
   fileData: WorkSheet
@@ -40,4 +46,10 @@ export type ContextBridge = {
   deleteTemplate: DeleteTemplate
   fetchTemplate: FetchTemplate
   testTemplate: TestTemplate
+}
+
+export type StyledCell = {
+  v: string
+  t: string
+  s: { fill: { fgColor: { rgb: string } } }
 }
