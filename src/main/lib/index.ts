@@ -2,10 +2,10 @@ import { PATH, fileEncoding, templateDir } from '@shared/constants'
 import {
   CompareBoms,
   DeleteTemplate,
-  ExtractTableData,
   FetchTemplate,
   FetchTemplateNames,
-  NewTableSchema,
+  NewCell,
+  NewSheet,
   StyledCell,
   TableSchema,
   TestTemplate
@@ -13,7 +13,7 @@ import {
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
 import XLSX, { WorkSheet, readFile } from 'xlsx-js-style'
-import { fetchXlsxAsAoa, findTableIndex } from '../utils'
+import { fetchSheets, fetchXlsxAsAoa, findTableIndex } from '../utils'
 
 export const getDir = (dir: string) => `${PATH}\\${dir}`
 
@@ -143,110 +143,108 @@ export const findTableRow = (data: WorkSheet, template: TableSchema[]) => {
   return cells.every((val, _, arr) => val.row === arr[0].row) ? cells : false
 }
 
-export const extractTableData: ExtractTableData = (fileTable, fileData) => {
-  const newTable: NewTableSchema = []
-
-  for (const { row, col, value: header } of fileTable) {
-    for (let key in fileData) {
-      if (
-        key.toString()[0].toLowerCase() === col.toLowerCase() &&
-        +key.toString().substring(1, key.length) >= +row
-      ) {
-        newTable.push({
-          col: key.toString()[0],
-          row: key.toString().substring(1, key.length),
-          header,
-          value: fileData[key].v
-        })
-      }
-    }
-  }
-
-  return newTable
-}
-
 export const compareBoms: CompareBoms = async (fileOne, fileTwo, template) => {
-  const [templateSchema, fileOneData, fileTwoData] = await Promise.all([
+  const [templateSchema, fileOneWb, fileTwoWb] = await Promise.all([
     fetchTemplate(template),
     readFile(fileOne),
     readFile(fileTwo)
   ])
 
-  if (!templateSchema || !fileOneData || !fileTwoData) return
-  false
+  if (!templateSchema || !fileOneWb || !fileTwoWb) return false
 
-  const fileOneSheets = Object.keys(fileOneData.Sheets)
-  const fileTwoSheets = Object.keys(fileTwoData.Sheets)
+  const [fileOneSheets, fileTwoSheets] = fetchSheets(fileOneWb, fileTwoWb)
 
+  const filenameOne = fileOne.substring(fileOne.lastIndexOf('\\') + 1, fileOne.indexOf('.xls'))
+  const filenameTwo = fileTwo.substring(fileTwo.lastIndexOf('\\') + 1, fileTwo.indexOf('.xls'))
+
+  const fileOneNewSheets: NewSheet = {} //Collection of new sheets with formatted data
+  const fileTwoNewSheets: NewSheet = {}
+  const sheetOneNew: NewCell = [] // new sheet with formatted data, to be inserted into newSheets{respective}
+  const sheetTwoNew: NewCell = []
+
+  console.log(`comparing ${filenameOne} + ${filenameTwo}`)
   try {
-    const finalSheetOne: (string | StyledCell)[][] = []
-    const finalSheetTwo: (string | StyledCell)[][] = []
-
     for (let i = 0; i < Math.max(fileOneSheets.length, fileTwoSheets.length); i++) {
-      const sheetOne = fileOneSheets[i]
-      const sheetTwo = fileTwoSheets[i]
-      const sheetOneData = fetchXlsxAsAoa(fileOneData, sheetOne)
-      const sheetTwoData = fetchXlsxAsAoa(fileTwoData, sheetTwo)
+      //iterate over highest sheets count
+      const sheetNameOne = fileOneSheets[i] //Sheet names @type string
+      const sheetNameTwo = fileTwoSheets[i]
 
-      const sheetOneTable = findTableIndex(sheetOneData, templateSchema, true)
-      const sheetTwoTable = findTableIndex(sheetTwoData, templateSchema, true)
+      //Get each workbooks current sheet
+      console.log('attempting to fetch sheets')
+      const [sheetFileOne, sheetFileTwo] = fetchXlsxAsAoa(
+        [fileOneWb, fileTwoWb],
+        [sheetNameOne, sheetNameTwo]
+      )
+      if (!sheetFileOne || !sheetFileTwo) return false
+      console.log('sheets fetched')
 
-      if (typeof sheetOneTable === 'number' || typeof sheetTwoTable === 'number') continue
+      //Get tables from current sheet
+      console.log('attempting to fetch tables')
+      const sheetOneTable = findTableIndex(sheetFileOne, templateSchema, true)
+      const sheetTwoTable = findTableIndex(sheetFileTwo, templateSchema, true)
+      if (typeof sheetOneTable === 'number' || typeof sheetTwoTable === 'number') return false //bugs out on delkim because of empty sheets
+      console.log('tables fetched: sheetone', sheetOneTable)
 
+      //Get the max length of each table, due to incosistent table rows
       const maxTableLength = Math.max(sheetOneTable.length, sheetTwoTable.length)
-
+      console.log('comparing tables')
       for (let index = 0; index < maxTableLength; index++) {
-        const tableOneRow = sheetOneTable[index]
-        const tableTwoRow = sheetTwoTable[index]
-        const newRowOne: (string | StyledCell)[] = [] //to be inserted into finalSheet{respective}
-        const newRowTwo: (string | StyledCell)[] = [] //to be inserted into finalSheet{respective}
+        const tableOneCurrentRow = sheetOneTable[index]?.toString().toLowerCase() //will either be string or undefined
+        const tableTwoCurrentRow = sheetTwoTable[index]?.toString().toLowerCase()
 
-        if (tableOneRow?.toString().toLowerCase() !== tableTwoRow?.toString().toLowerCase()) {
-          const cellLength = Math.max(tableOneRow?.length, tableTwoRow?.length)
+        //cells between tables don't match
+        if (tableOneCurrentRow !== tableTwoCurrentRow) {
+          const cellLength = Math.max(sheetOneTable[index]?.length, sheetTwoTable[index]?.length)
 
+          const newRowOne: StyledCell[] = []
+          const newRowTwo: StyledCell[] = []
+
+          //Iterate over the cell and make each cell green to hightlight
           for (let cell = 0; cell < cellLength; cell++) {
-            const newCellOne = {
-              v: tableOneRow[cell],
+            newRowOne.push({
+              v: sheetOneTable[index][cell],
               t: 's',
               s: { fill: { fgColor: { rgb: '32cd32' } } }
-            }
-            const newCellTwo = {
-              v: tableTwoRow[cell],
+            })
+            newRowTwo.push({
+              v: sheetTwoTable[index][cell],
               t: 's',
               s: { fill: { fgColor: { rgb: '32cd32' } } }
-            }
-
-            newRowOne.push(newCellOne)
-            newRowTwo.push(newCellTwo)
+            })
           }
 
-          finalSheetOne.push(newRowOne)
-          finalSheetTwo.push(newRowTwo)
+          //Push new style to table sheet
+          sheetOneNew.push(newRowOne)
+          sheetTwoNew.push(newRowTwo)
         } else {
-          //if match then just insert, no change needed
-          finalSheetOne.push(tableOneRow)
-          finalSheetTwo.push(tableTwoRow)
+          //is match so just add
+          sheetOneNew.push(sheetOneTable[index])
+          sheetTwoNew.push(sheetTwoTable[index])
         }
       }
+      console.log('table compared')
+      fileOneNewSheets[`${sheetNameOne}-fileOne`] = sheetOneNew
+      fileTwoNewSheets[`${sheetNameTwo}-fileTwo`] = sheetTwoNew
     }
 
-    return writeToXLSXFile(
-      [XLSX.utils.aoa_to_sheet(finalSheetOne), XLSX.utils.aoa_to_sheet(finalSheetTwo)],
-      'test'
-    )
+    console.log('all tables compared')
+    return writeToXLSXFile({ ...fileOneNewSheets, ...fileTwoNewSheets })
   } catch (error) {
     console.error(error)
     return false
   }
 }
 
-export const writeToXLSXFile = (sheets: [WorkSheet, WorkSheet], fileName: string) => {
+export const writeToXLSXFile = (sheets: NewSheet) => {
   const workbook = XLSX.utils.book_new()
+  let fileName
+  for (let [key, value] of Object.entries(sheets)) {
+    if (key.length > 31) key = key.substring(0, 31) //sheet names can't exceed 31 chars so trim
+    fileName = key
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(value), key)
+  }
 
-  for (let i = 0; i < sheets.length; i++)
-    XLSX.utils.book_append_sheet(workbook, sheets[i], `${fileName}-${i}`)
-
-  XLSX.writeFile(workbook, `C:\\Users\\micha\\Desktop\\${fileName}-${Date.now()}.xlsx`)
-  console.log('file created')
+  XLSX.writeFile(workbook, `C:\\Users\\micha\\Desktop\\${fileName}.xlsx`)
+  console.log('file saved')
   return true
 }

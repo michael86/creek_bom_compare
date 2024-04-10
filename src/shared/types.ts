@@ -9,17 +9,15 @@ export type DeleteTemplate = (name: string) => Promise<boolean>
 export type FetchTemplate = (name: string) => Promise<TableSchema[] | undefined>
 export type TestTemplate = (template: string, file: string) => Promise<boolean>
 export type OnTestTemplateResult = (callback: (valid: boolean) => void) => void
-export type CompareBoms = (fileOne: string, fileTwo: string, template: string) => void
-export type FetchXlsxAsAoa = (wb: WorkBook, sheet: string) => WorkSheet
+export type CompareBoms = (fileOne: string, fileTwo: string, template: string) => Promise<boolean>
+export type NewSheet = { [key: string]: NewCell }
+export type NewCell = (string | StyledCell)[][]
 export type FindTableIndex = (
   arr: WorkSheet,
   template: TableSchema[],
   splice?: boolean
 ) => string[][] | number
-export type ExtractTableData = (
-  fileTable: { row: string; col: string; value: string }[],
-  fileData: WorkSheet
-) => NewTableSchema
+export type FetchSheets = (wbOne: WorkBook, wbTwo: WorkBook) => [string[], string[]]
 export type NewTableSchema = { row: string; col: string; header: string; value: string }[]
 export type XLSXCell =
   | {

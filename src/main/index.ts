@@ -70,9 +70,7 @@ app.whenReady().then(() => {
   ipcMain.handle('fetchTemplateNames', (_) => fetchTemplateNames())
   ipcMain.handle('deleteTemplate', (_, name) => deleteTemplate(name))
   ipcMain.handle('fetchTemplate', (_, name) => fetchTemplate(name))
-  ipcMain.handle('testTemplate', (_, template, file, autoFind) =>
-    testTemplate(template, file, autoFind)
-  )
+  ipcMain.handle('testTemplate', (_, template, file) => testTemplate(template, file))
   ipcMain.handle('compareBoms', (_, fileOne, fileTwo, template) =>
     compareBoms(fileOne, fileTwo, template)
   )

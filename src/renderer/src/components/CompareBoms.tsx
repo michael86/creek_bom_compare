@@ -1,5 +1,6 @@
 import { fetchFiles } from '@renderer/utils'
 import { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 import '../assets/compare_boms.css'
 import SelectTemplate from './SelectTemplate'
 
@@ -20,20 +21,28 @@ const CompareBoms = () => {
     })()
   }, [fetchFiles])
 
-  const onClick = () => {
+  const onClick = async () => {
     if (
       !fileRefs.current[0]?.files ||
-      !fileRefs.current[0]?.files[0].path ||
+      !fileRefs.current[0]?.files[0]?.path ||
       !fileRefs.current[1]?.files ||
-      !fileRefs.current[1]?.files[0].path ||
+      !fileRefs.current[1]?.files[0]?.path ||
       !selectRef.current?.value
-    )
+    ) {
+      toast.error('Both files need to be selected')
       return
+    }
 
     const firstFile = fileRefs.current[0].files[0].path
     const secondFile = fileRefs.current[1].files[0].path
     const template = selectRef.current.value
-    window.context.compareBoms(firstFile, secondFile, template)
+    const res = await window.context.compareBoms(firstFile, secondFile, template)
+
+    if (!res) {
+      toast.error('failed to save file, are you sure the templates are correct? ')
+      return
+    }
+    toast.success('File Saved ')
   }
 
   return (

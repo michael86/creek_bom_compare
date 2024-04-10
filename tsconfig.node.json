@@ -7,6 +7,10 @@
     "src/shared/**/*"
   ],
   "compilerOptions": {
+    "lib": [
+            "es5", "es6", "dom", "dom.iterable"
+        ],
+    
     "composite": true,
     "types": [
       "electron-vite/node"
