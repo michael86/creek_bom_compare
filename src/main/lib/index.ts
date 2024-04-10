@@ -10,6 +10,7 @@ import {
   TableSchema,
   TestTemplate
 } from '@shared/types'
+import { app, dialog } from 'electron'
 import fs, { ensureDir } from 'fs-extra'
 import path from 'path'
 import XLSX, { WorkSheet, readFile } from 'xlsx-js-style'
@@ -183,7 +184,7 @@ export const compareBoms: CompareBoms = async (fileOne, fileTwo, template) => {
       const sheetOneTable = findTableIndex(sheetFileOne, templateSchema, true)
       const sheetTwoTable = findTableIndex(sheetFileTwo, templateSchema, true)
       if (typeof sheetOneTable === 'number' || typeof sheetTwoTable === 'number') return false //bugs out on delkim because of empty sheets
-      console.log('tables fetched: sheetone', sheetOneTable)
+      console.log('tables fetched')
 
       //Get the max length of each table, due to incosistent table rows
       const maxTableLength = Math.max(sheetOneTable.length, sheetTwoTable.length)
@@ -235,16 +236,23 @@ export const compareBoms: CompareBoms = async (fileOne, fileTwo, template) => {
   }
 }
 
-export const writeToXLSXFile = (sheets: NewSheet) => {
+export const writeToXLSXFile = async (sheets: NewSheet) => {
   const workbook = XLSX.utils.book_new()
-  let fileName
+
   for (let [key, value] of Object.entries(sheets)) {
     if (key.length > 31) key = key.substring(0, 31) //sheet names can't exceed 31 chars so trim
-    fileName = key
+
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(value), key)
   }
 
-  XLSX.writeFile(workbook, `C:\\Users\\micha\\Desktop\\${fileName}.xlsx`)
+  const { filePath } = await dialog.showSaveDialog({
+    title: 'Save File',
+    defaultPath: app.getPath('documents'),
+    filters: [{ name: 'Text Files', extensions: ['xlsx'] }]
+  })
+
+  if (!filePath) return false
+  XLSX.writeFile(workbook, filePath)
   console.log('file saved')
   return true
 }

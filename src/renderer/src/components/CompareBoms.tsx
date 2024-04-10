@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import '../assets/compare_boms.css'
 import SelectTemplate from './SelectTemplate'
-
 const CompareBoms = () => {
   const fileRefs = useRef<Array<HTMLInputElement | null>>([null, null])
   const [files, setFiles] = useState<string[] | null>(null)
@@ -45,6 +44,10 @@ const CompareBoms = () => {
     toast.success('File Saved ')
   }
 
+  const onSetSave = () => {
+    // dialog.showOpenDialog({ properties: ['openFile', 'openDirectory', 'multiSelections'] })
+  }
+
   return (
     <div className="compare-boms-container">
       <h2>Compare Boms</h2>
@@ -72,6 +75,7 @@ const CompareBoms = () => {
       </div>
 
       <button onClick={onClick}>Compare boms</button>
+      <button onClick={onSetSave}>Set save location</button>
 
       <div className="output-container"></div>
     </div>
