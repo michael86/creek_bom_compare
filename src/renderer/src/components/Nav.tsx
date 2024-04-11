@@ -41,7 +41,6 @@ const Nav: React.FC<Props> = ({ setScene }) => {
             <p>Boms</p>
             <ul className={`nav-child ${show.boms ? ' show' : ''}`}>
               <li onClick={() => setScene(5)}>Compare</li>
-              <li onClick={() => setScene(6)}>View</li>
             </ul>
           </li>
         </ul>

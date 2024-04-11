@@ -1,0 +1,8 @@
+.how-to-container {
+  width: 80%;
+  max-height: 520px;
+  max-width: 600px;
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}

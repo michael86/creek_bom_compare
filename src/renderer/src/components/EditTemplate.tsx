@@ -3,7 +3,6 @@ import { TableSchema } from '@shared/types'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import '../assets/edit_template.css'
-import infoImage from '../assets/icons8-info-48.png'
 import SelectTemplate from './SelectTemplate'
 import TemplateTable from './TemplateTable'
 
@@ -12,7 +11,6 @@ const EditTemplate = () => {
   const [file, setFile] = useState<string | null>(null)
 
   const [template, setTemplate] = useState<TableSchema[] | undefined>(undefined)
-  const [showInfo, setShowInfo] = useState<boolean>(false)
 
   const selectRef = useRef<HTMLSelectElement | null>(null)
   const inputRef = useRef<HTMLTableRowElement[]>([])
@@ -69,27 +67,15 @@ const EditTemplate = () => {
     inputRef.current = []
   }
 
-  const onMouseEnter = () => setShowInfo(true)
-  const onMouseLeave = () => setShowInfo(false)
-
   return (
     <div className="edit-template-container">
-      <div className="edit-template-header">
-        <h2>Edit Template</h2>
-        <img src={infoImage} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
-      </div>
+      <h2>Edit Template</h2>
+
       {files &&
         (files.length > 0 ? (
           <>
             <SelectTemplate files={files} innerRef={selectRef} />
             <button onClick={() => onViewTemplate()}>View Template</button>
-
-            {showInfo && (
-              <>
-                <p>To edit a template, simply change the field required</p>
-                <p>any fields you don't want to change can be left as they are</p>
-              </>
-            )}
 
             {template && (
               <TemplateTable

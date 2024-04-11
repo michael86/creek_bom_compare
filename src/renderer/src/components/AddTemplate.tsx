@@ -2,20 +2,18 @@ import { TableSchema } from '@shared/types'
 import React, { useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import '../assets/add_template.css'
-import infoImage from '../assets/icons8-info-48.png'
-import AddTemplateInfo from './AddTemplateInfo'
 import TemplateTable from './TemplateTable'
-
 const AddTemplate: React.FC = () => {
   const templateName = useRef<HTMLInputElement>(null)
   const tableHeader = useRef<HTMLInputElement>(null)
 
   const [tableNames, setTableNames] = useState<TableSchema[]>([])
-  const [showInfo, setShowInfo] = useState<boolean>(false)
 
-  type OnSubmit = (e: React.FormEvent) => void
+  type OnSubmit = (e: React.FormEvent | React.KeyboardEvent<HTMLInputElement>) => void
   const onSubmit: OnSubmit = async (e) => {
     e.preventDefault()
+
+    if ((e as React.KeyboardEvent).key && (e as React.KeyboardEvent).key !== 'Enter') return
     const { current: name } = tableHeader
 
     if (!name?.value) return
@@ -23,6 +21,7 @@ const AddTemplate: React.FC = () => {
     setTableNames([...tableNames, { name: name.value }])
 
     name.value = ''
+    name.focus()
   }
 
   const onClick = async () => {
@@ -46,22 +45,27 @@ const AddTemplate: React.FC = () => {
     setTableNames([])
   }
 
-  const onMouseEnter = () => setShowInfo(true)
-  const onMouseLeave = () => setShowInfo(false)
+  const deleteRow = (index: number) => {
+    tableNames.splice(index, 1)
+    setTableNames(structuredClone(tableNames))
+  }
 
   return (
     <>
       <div className="add-template-container">
-        <div className="add-template-header-container">
-          <h2 className="add-template-header">Add New Template</h2>
-          <img src={infoImage} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
-        </div>
+        <h2 className="add-template-header">Add New Template</h2>
+
         <form onSubmit={onSubmit} className="add-template container">
           <div className="add-template name">
             <label htmlFor="name">Name</label>
             <input type="text" name="name" id="name" ref={templateName} />
           </div>
-          <input type="text" placeholder="Enter Table Header Name" ref={tableHeader} />
+          <input
+            type="text"
+            placeholder="Enter Table Header Name"
+            ref={tableHeader}
+            onKeyUp={onSubmit}
+          />
 
           <button type="button" onClick={onSubmit}>
             Add New Header
@@ -69,10 +73,9 @@ const AddTemplate: React.FC = () => {
         </form>
         {tableNames.length > 0 && (
           <>
-            <TemplateTable onClick={onClick} tableNames={tableNames} />
+            <TemplateTable onClick={onClick} deleteRow={deleteRow} tableNames={tableNames} />
           </>
         )}
-        {showInfo && <AddTemplateInfo />}
       </div>
     </>
   )

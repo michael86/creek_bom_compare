@@ -44,10 +44,6 @@ const CompareBoms = () => {
     toast.success('File Saved ')
   }
 
-  const onSetSave = () => {
-    // dialog.showOpenDialog({ properties: ['openFile', 'openDirectory', 'multiSelections'] })
-  }
-
   return (
     <div className="compare-boms-container">
       <h2>Compare Boms</h2>
@@ -75,7 +71,6 @@ const CompareBoms = () => {
       </div>
 
       <button onClick={onClick}>Compare boms</button>
-      <button onClick={onSetSave}>Set save location</button>
 
       <div className="output-container"></div>
     </div>

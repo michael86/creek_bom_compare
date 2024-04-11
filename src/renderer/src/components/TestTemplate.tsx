@@ -1,7 +1,6 @@
 import { fetchFiles } from '@renderer/utils'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-import infoImage from '../assets/icons8-info-48.png'
 import '../assets/test_template.css'
 import SelectTemplate from './SelectTemplate'
 
@@ -9,8 +8,6 @@ const TestTemplate = () => {
   const [files, setFiles] = useState<string[] | null>(null)
   const templateRef = useRef<HTMLSelectElement | null>(null)
   const fileRef = useRef<HTMLInputElement | null>(null)
-
-  const [showInfo, setShowInfo] = useState<boolean>()
 
   useEffect(() => {
     ;(async () => setFiles(await fetchFiles()))()
@@ -37,15 +34,10 @@ const TestTemplate = () => {
     toast.success('test passed')
   }
 
-  const onMouseEnter = () => setShowInfo(true)
-  const onMouseLeave = () => setShowInfo(false)
-
   return (
     <div className="test-template-container">
-      <div className="test-template-header">
-        <h2>Test files</h2>
-        <img src={infoImage} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} />
-      </div>
+      <h2>Test files</h2>
+
       {files && (
         <>
           <div>
@@ -60,13 +52,6 @@ const TestTemplate = () => {
           />
 
           <button onClick={onClick}>Test</button>
-        </>
-      )}
-      {showInfo && (
-        <>
-          <p>This is to ensure your templates find the table in the selected template.</p>
-          <p>To use, select the template required, and the file you want to test</p>
-          <p>Click test, and await the results</p>
         </>
       )}
     </div>

@@ -146,6 +146,13 @@ export const compareBoms: CompareBoms = async (fileOne, fileTwo, template) => {
   }
 }
 
+/**
+ *
+ * Will create a new book and attempt to write sheets to it, then ask user where to save
+ *
+ * @param sheets object containing sheets with key being sheet name and value being a 2d array to be fed to xlsx.util.aoa_to_sheet
+ * @returns boolean
+ */
 export const writeToXLSXFile = async (sheets: NewSheet) => {
   const workbook = XLSX.utils.book_new()
 
