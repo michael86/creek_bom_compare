@@ -3,15 +3,16 @@ import {
   deleteTemplate,
   fetchTemplate,
   fetchTemplateNames,
-  getDir,
   saveTemplate,
   testTemplate
 } from '@/lib'
+
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { TableSchema } from '@shared/types'
 import { BrowserWindow, app, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+import { getDir } from './utils'
 
 function createWindow(): void {
   // Create the browser window.
