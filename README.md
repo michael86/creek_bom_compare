@@ -1,30 +1,3 @@
 # creek_bom_converter
 
-This is a simple Electron boilerplate that uses React and Typescript along with fs-extra and lodash bundled in for ease. All of the configs have had their paths set up for electron compiling.
-
-## Project Setup
-
-### Install
-
-```bash
-$ yarn
-```
-
-### Development
-
-```bash
-$ yarn dev
-```
-
-### Build
-
-```bash
-# For windows
-$ yarn build:win
-
-# For macOS
-$ yarn build:mac
-
-# For Linux
-$ yarn build:linux
-```
+This is a simple Electron application that uses React and Typescript along with fs-extra and lodash bundled in. The application is used to compare two xls spreadsheets against each other, creating a new spreadsheet showing the differences
